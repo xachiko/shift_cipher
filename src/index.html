@@ -1,0 +1,116 @@
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'none'; script-src 'self'; style-src 'self'; connect-src 'none'; form-action 'none'; base-uri 'none'"
+    />
+    <meta name="referrer" content="no-referrer" />
+    <title>Shift Cipher</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <main class="app">
+      <header>
+        <h1>Shift Cipher</h1>
+        <p>
+          Geser huruf sebanyak kunci. Teks: 26 huruf. File: seluruh byte
+          (0–255).
+        </p>
+      </header>
+
+      <div
+        id="message"
+        class="message"
+        role="alert"
+        aria-live="assertive"
+        hidden
+      ></div>
+
+      <section class="panel" aria-label="Pengaturan">
+        <div class="row">
+          <label for="inputType">Jenis input</label>
+          <select id="inputType">
+            <option value="text">Teks (papan ketik)</option>
+            <option value="file">File (teks / biner)</option>
+          </select>
+        </div>
+
+        <fieldset class="row">
+          <legend>Operasi</legend>
+          <label class="choice"
+            ><input type="radio" name="operation" value="encrypt" checked />
+            Enkripsi</label
+          >
+          <label class="choice"
+            ><input type="radio" name="operation" value="decrypt" />
+            Dekripsi</label
+          >
+        </fieldset>
+
+        <div class="row">
+          <label for="key">Kunci (bilangan bulat)</label>
+          <input
+            id="key"
+            type="text"
+            inputmode="numeric"
+            autocomplete="off"
+            spellcheck="false"
+            maxlength="10"
+            placeholder="contoh: 3"
+          />
+          <small id="keyHint">Teks: dihitung mod 26. File: mod 256.</small>
+        </div>
+      </section>
+
+      <section class="panel" id="textBox" aria-label="Input teks">
+        <label for="inputText" id="inputTextLabel">Plainteks</label>
+        <textarea
+          id="inputText"
+          rows="6"
+          maxlength="100000"
+          spellcheck="false"
+          placeholder="Ketik pesan di sini"
+        ></textarea>
+        <small
+          ><span id="counter">0</span> / 100.000 karakter. Hanya huruf A–Z yang
+          diproses; karakter lain dibuang.</small
+        >
+
+        <div class="row" id="groupRow">
+          <label for="groupMode">Tampilan cipherteks</label>
+          <select id="groupMode">
+            <option value="none">Tanpa spasi</option>
+            <option value="five">Kelompok 5 huruf</option>
+          </select>
+        </div>
+      </section>
+
+      <section class="panel" id="fileBox" aria-label="Input file" hidden>
+        <label for="inputFile" id="inputFileLabel">Pilih file</label>
+        <input id="inputFile" type="file" />
+        <small id="fileInfo"
+          >Maksimal 10 MB. Hasil enkripsi disimpan sebagai .dat.</small
+        >
+      </section>
+
+      <div class="actions">
+        <button id="run" type="button" class="primary">Enkripsi</button>
+        <button id="reset" type="button">Bersihkan</button>
+      </div>
+
+      <section class="panel" aria-label="Hasil">
+        <label for="output" id="outputLabel">Hasil</label>
+        <textarea id="output" rows="6" readonly spellcheck="false"></textarea>
+        <div class="actions">
+          <button id="download" type="button" disabled>Simpan ke file</button>
+          <button id="copy" type="button" disabled>Salin</button>
+        </div>
+      </section>
+    </main>
+
+    <script src="script.js"></script>
+  </body>
+</html>

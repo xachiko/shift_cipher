@@ -88,19 +88,80 @@
   }
 
   // ====== Logika Shift Cipher: teks (26 huruf) ======
-  function shiftText(text, k) {}
+  function shiftText(text, k) {
+    const shift = ((k % 26) + 26) % 26;
+    let res = "";
+    for (let i = 0; i < text.length; i++) {
+      const code = text.charCodeAt(i);
+      if (code >= 65 && code <= 90) {
+        // A-Z
+        res += String.fromCharCode(((code - 65 + shift) % 26) + 65);
+      } else if (code >= 97 && code <= 122) {
+        // a-z
+        res += String.fromCharCode(((code - 97 + shift) % 26) + 97);
+      }
+    }
+    return res;
+  }
 
   function groupBy5(s) {
-    return s.replace(/(.{5})(?=.)/g, "$1 ");
+    return (s.match(/.{1,5}/g) || []).join(" ");
   }
 
   // Logika Shift Cipher: file (byte 0-255)
-  function shiftBytes(bytes, k) {}
+  function shiftBytes(bytes, k) {
+    const shift = ((k % 256) + 256) % 256;
+    const out = new Uint8Array(bytes.length);
+    for (let i = 0; i < bytes.length; i++) {
+      out[i] = (bytes[i] + shift) & 0xff;
+    }
+    return out;
+  }
 
   // Format file cipherteks: MAGIC(4) | panjang nama(1) | nama asli | data terenkripsi
-  function buildCipherFile(name, encrypted) {}
+  function buildCipherFile(name, encrypted) {
+    const cleanName = sanitizeFilename(name);
+    const nameBytes = new TextEncoder().encode(cleanName);
+    const safeNameBytes = nameBytes.slice(0, 255);
+    const headerLen = 4 + 1 + safeNameBytes.length;
+    const packet = new Uint8Array(headerLen + encrypted.length);
 
-  function parseCipherFile(bytes) {}
+    // MAGIC header
+    packet.set(MAGIC, 0);
+    // Panjang nama file
+    packet[4] = safeNameBytes.length;
+    // Nama file UTF-8
+    packet.set(safeNameBytes, 5);
+    // Payload byte terenkripsi
+    packet.set(encrypted, headerLen);
+
+    return packet;
+  }
+
+  function parseCipherFile(bytes) {
+    if (bytes.length < 5) {
+      throw new Error("File cipherteks tidak valid atau terlalu kecil.");
+    }
+    // Periksa MAGIC header
+    for (let i = 0; i < MAGIC.length; i++) {
+      if (bytes[i] !== MAGIC[i]) {
+        throw new Error(
+          "Format file tidak dikenali. Pastikan file merupakan cipherteks .dat yang valid.",
+        );
+      }
+    }
+
+    const nameLen = bytes[4];
+    if (bytes.length < 5 + nameLen) {
+      throw new Error("File cipherteks rusak atau terpotong.");
+    }
+
+    const nameBytes = bytes.subarray(5, 5 + nameLen);
+    const name = sanitizeFilename(new TextDecoder().decode(nameBytes)) || "file_pulih";
+    const data = bytes.subarray(5 + nameLen);
+
+    return { name, data };
+  }
 
   // inti program
   async function handleRun() {
@@ -117,10 +178,10 @@
 
         let out;
         if (encrypt) {
-          out = console.log("Haloooo"); // shiftText(text, k).toUpperCase(); // ubah sini brokk
+          out = shiftText(text, k).toUpperCase();
           if (el.groupMode.value === "five") out = groupBy5(out);
         } else {
-          out = console.log("Haloooo"); // shiftText(text, (26 - k) % 26).toLowerCase(); // ini juga
+          out = shiftText(text, (26 - k) % 26).toLowerCase();
         }
         el.output.value = out;
         result = {
@@ -137,16 +198,18 @@
 
         const bytes = new Uint8Array(await file.arrayBuffer());
         if (encrypt) {
-          const packed = console.log("Haloooo"); // buildCipherFile(file.name, shiftBytes(bytes, k));
+          const encrypted = shiftBytes(bytes, k);
+          const packed = buildCipherFile(file.name, encrypted);
           result = {
             blob: new Blob([packed], { type: "application/octet-stream" }),
             filename: "cipherteks.dat",
           };
           el.output.value = `Terenkripsi: ${sanitizeFilename(file.name)} (${bytes.length} byte). Klik "Simpan ke file".`;
         } else {
-          const { name, data } = console.log("Haloooo"); //parseCipherFile(bytes);
+          const { name, data } = parseCipherFile(bytes);
+          const decrypted = shiftBytes(data, (256 - k) % 256);
           result = {
-            blob: new Blob([shiftBytes(data, (256 - k) % 256)], {
+            blob: new Blob([decrypted], {
               type: "application/octet-stream",
             }),
             filename: name,

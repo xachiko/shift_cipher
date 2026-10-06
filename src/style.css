@@ -42,11 +42,6 @@ h1 {
   text-align: center;
   color: var(--accent);
 }
-header p {
-  margin: 0 0 20px;
-  color: var(--muted);
-  text-align: center;
-}
 
 .panel {
   background: var(--surface);

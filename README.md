@@ -6,6 +6,16 @@ Universitas Sebelas Maret | Semester Ganjil 2026/2027
 
 ---
 
+## Anggota Kelompok
+
+1. Deoshi Anessah Zheren Areja (L0124009)
+2. Faadhilah Hana Gustie Fatimah (L0124012)
+3. Jelita Kustyara Nanda Safitri (L0124020)
+4. Kevin Ananda Putra (L0124103)
+5. Shaira Masyhita Putri Hatala (L0124119)
+
+---
+
 ## Deskripsi
 
 Aplikasi web untuk mengenkripsi dan mendekripsi pesan menggunakan **Shift Cipher** (Caesar Cipher).  
